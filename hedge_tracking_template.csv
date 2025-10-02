@@ -1,0 +1,7 @@
+Layer,Strategy,Instrument,Strike,Expiry_Date,Contracts,Entry_Date,Entry_Price,Current_Price,Days_to_Expiry,Cost_Basis,Current_Value,Unrealized_PL,Theta_Decay_Daily,Delta,Gamma,Vega,Implied_Vol,Protection_Level,Notes
+Layer 1,Collar - Put Leg,SPX Put,4400,2025-04-18,10,2025-01-15,25.50,28.30,107,25500,28300,2800,-45,-0.35,0.008,125,0.18,0-2% decline,Near-term protection
+Layer 1,Collar - Call Leg,SPX Call,4600,2025-04-18,10,2025-01-15,-18.20,-15.40,107,-18200,-15400,2800,32,0.28,0.007,-98,0.16,Upside cap at 102%,Reduces net cost
+Layer 2,Put Spread - Long,SPX Put,4275,2025-07-18,15,2025-01-15,42.80,45.20,198,64200,67800,3600,-38,-0.42,0.006,185,0.19,5-15% decline,Intermediate protection
+Layer 2,Put Spread - Short,SPX Put,3825,2025-07-18,15,2025-01-15,-28.50,-29.10,198,-42750,-43650,-900,22,-0.18,0.003,-95,0.21,Caps max payout,Cost reduction
+Layer 3a,Far OTM Put,SPX Put,3600,2026-01-16,20,2025-01-15,18.40,19.80,380,36800,39600,2800,-12,-0.15,0.002,245,0.24,20%+ decline,Black swan protection
+Layer 3b,Volatility Hedge,VIX Call,40,2025-06-18,25,2025-01-15,3.20,2.85,168,8000,7125,-875,-8,0.42,0.015,68,0.85,Vol spike protection,Crisis indicator

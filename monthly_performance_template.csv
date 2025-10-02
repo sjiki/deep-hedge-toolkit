@@ -1,0 +1,13 @@
+Month,Portfolio_Start_Value,Portfolio_End_Value,Portfolio_Return_Pct,Market_Return_SPX_Pct,Hedge_Cost_Monthly,Hedge_Realized_PL,Hedge_Unrealized_PL,Total_Hedge_Impact,Net_Return_Pct,Max_Drawdown_Pct,Sharpe_Ratio,Beta,Alpha_Pct,VIX_Avg,Notes
+Jan 2025,10000000,10150000,1.50,1.80,-12500,0,2800,-9700,1.40,-0.50,1.25,1.05,0.15,14.2,Low volatility month
+Feb 2025,10150000,9950000,-1.97,-2.50,-12500,15000,8500,11000,-0.86,-2.10,1.18,1.02,0.68,18.5,Hedges offset decline
+Mar 2025,9950000,10250000,3.02,3.20,-12500,-5000,1200,-16300,2.85,-0.30,1.32,1.04,0.15,15.8,Strong rally reduced hedge value
+Apr 2025,,,,,,-12500,,,,,,,,,
+May 2025,,,,,,-12500,,,,,,,,,
+Jun 2025,,,,,,-12500,,,,,,,,,
+Jul 2025,,,,,,-12500,,,,,,,,,
+Aug 2025,,,,,,-12500,,,,,,,,,
+Sep 2025,,,,,,-12500,,,,,,,,,
+Oct 2025,,,,,,-12500,,,,,,,,,
+Nov 2025,,,,,,-12500,,,,,,,,,
+Dec 2025,,,,,,-12500,,,,,,,,,

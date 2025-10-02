@@ -1,0 +1,8 @@
+Date,Trigger_Type,Trigger_Detail,Current_Value,Target_Value,Action_Required,Action_Taken,Contracts_Adjusted,Cost_Impact,Status,Notes
+2025-01-15,Initial Setup,Portfolio start,10000000,10000000,Execute all layers,All layers executed,70,150000,Complete,Initial hedge implementation
+2025-02-15,Monthly Review,30-day check,9950000,10000000,None - within tolerance,No action,0,0,Complete,Minor portfolio decline within range
+2025-03-15,Roll Required,Layer 1 expiry in 30 days,10250000,10250000,Roll Layer 1 positions,Rolled to June expiry,20,48000,Complete,Maintained strikes at new market level
+2025-04-15,VIX Spike,VIX jumped to 28,10180000,10180000,Consider vol profit-taking,Sold 50% VIX calls,12,15000,Complete,Took profits on volatility hedge
+2025-05-15,Portfolio Growth,Portfolio up 12%,11200000,11200000,Increase hedge ratio,Added 8 contracts across layers,8,32000,Pending,Scale up protection
+,,,,,,,,,,
+,,,,,,,,,,
