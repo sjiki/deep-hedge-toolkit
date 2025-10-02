@@ -2,6 +2,9 @@
 
 A comprehensive suite of tools for implementing and managing multi-layered portfolio hedging strategies.
 
+![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 ---
 
 ## 📦 What's Included
@@ -19,14 +22,7 @@ Python-based calculator for designing optimal hedge strategies:
 - ✓ Determines optimal coverage ratio to meet risk/cost targets
 - ✓ Generates comprehensive Excel reports
 
-### 2. **Interactive Calculator** (`interactive_hedge_calculator.py`)
-Command-line interface for easy hedge design:
-- Guided input for portfolio parameters
-- Real-time cost and protection calculations
-- Scenario analysis visualization
-- One-click Excel report generation
-
-### 3. **Backtesting Tool** (`backtest_hedge_strategy.py`)
+### 2. **Backtesting Tool** (`backtest_hedge_strategy.py`)
 Historical performance analysis:
 - Tests against 8 major market crashes (1987-2022)
 - Monte Carlo simulation (10,000+ paths)
@@ -40,7 +36,7 @@ Historical performance analysis:
 - 2020 COVID Crash (-34%)
 - And more...
 
-### 4. **Implementation Workflow** (`deep_hedge_workflow.md`)
+### 3. **Implementation Workflow** (`deep_hedge_workflow.md`)
 Step-by-step guide with:
 - 6 phases from assessment to crisis management
 - Weekly/monthly/quarterly checklists
@@ -48,7 +44,7 @@ Step-by-step guide with:
 - Crisis response protocols
 - Tax and regulatory considerations
 
-### 5. **Spreadsheet Templates** (CSV format)
+### 4. **Spreadsheet Templates** (CSV format)
 Ready-to-use tracking templates:
 - `hedge_tracking_template.csv` - Position tracking with Greeks
 - `monthly_performance_template.csv` - Monthly P&L analysis
@@ -59,22 +55,32 @@ Ready-to-use tracking templates:
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- Python 3.8 or higher
+- pip package manager
+- Microsoft Excel or LibreOffice (for viewing generated reports)
+
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/sjiki/deep-hedge-toolkit.git
+cd deep-hedge-toolkit
+
 # Install required packages
 pip install -r requirements.txt
 ```
 
+### Verify Installation
+
+```bash
+python -c "from hedge_calculator import DeepHedgeCalculator; print('✓ Installation successful')"
+```
+
 ### Basic Usage
 
-**Option 1: Interactive Calculator**
-```bash
-python interactive_hedge_calculator.py
-```
-Follow the prompts to enter your portfolio details and generate a custom hedge strategy.
-
-**Option 2: Direct Calculation**
+**Option 1: Direct Calculation**
 ```python
 from hedge_calculator import DeepHedgeCalculator
 
@@ -104,7 +110,7 @@ print(optimal)
 calculator.generate_report('my_hedge_analysis.xlsx')
 ```
 
-**Option 3: Backtesting**
+**Option 2: Backtesting**
 ```bash
 python backtest_hedge_strategy.py
 ```
@@ -263,19 +269,18 @@ Hedged portfolios typically show improved Sharpe ratios due to reduced downside 
 
 ### Files in This Package
 1. `hedge_calculator.py` - Core calculation engine
-2. `interactive_hedge_calculator.py` - CLI interface
-3. `backtest_hedge_strategy.py` - Historical analysis
-4. `deep_hedge_workflow.md` - Implementation guide
-5. `hedge_tracking_template.csv` - Position tracker
-6. `monthly_performance_template.csv` - Performance tracker
-7. `rebalancing_checklist.csv` - Action tracker
-8. `scenario_analysis_template.csv` - Stress test template
-9. `requirements.txt` - Python dependencies
-10. `README.md` - This file
+2. `backtest_hedge_strategy.py` - Historical analysis
+3. `deep_hedge_workflow.md` - Implementation guide
+4. `hedge_tracking_template.csv` - Position tracker
+5. `monthly_performance_template.csv` - Performance tracker
+6. `rebalancing_checklist.csv` - Action tracker
+7. `scenario_analysis_template.csv` - Stress test template
+8. `requirements.txt` - Python dependencies
+9. `README.md` - This file
 
 ### Learning Resources
-- CBOE Education Portal: www.cboe.com/education
-- Options Industry Council: www.optionseducation.org
+- [CBOE Education Portal](https://www.cboe.com/education)
+- [Options Industry Council](https://www.optionseducation.org)
 - CFA Institute hedging frameworks
 
 ---
@@ -283,13 +288,29 @@ Hedged portfolios typically show improved Sharpe ratios due to reduced downside 
 ## 🤝 Support
 
 For questions or issues:
-1. Review the workflow guide (`deep_hedge_workflow.md`)
+1. Review the workflow guide ([deep_hedge_workflow.md](deep_hedge_workflow.md))
 2. Check example outputs in generated Excel reports
-3. Consult with a financial advisor for personalized advice
+3. [Open an issue](https://github.com/sjiki/deep-hedge-toolkit/issues) on GitHub
+4. Consult with a financial advisor for personalized advice
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
 ## 📄 License & Disclaimer
+
+**LICENSE:** MIT License - See [LICENSE](LICENSE) file for details.
 
 **DISCLAIMER:** This toolkit is for educational and informational purposes only.
 It is NOT financial advice. Always consult with qualified financial professionals
@@ -300,7 +321,7 @@ future results. Options trading involves substantial risk of loss.
 
 ## 🔄 Version History
 
-**Version 1.0** (2025-10-02)
+**Version 1.0** (2025-02-01)
 - Initial release
 - Multi-layer hedge calculator
 - Historical backtesting (8 scenarios)
