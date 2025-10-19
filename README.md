@@ -276,7 +276,8 @@ Hedged portfolios typically show improved Sharpe ratios due to reduced downside 
 6. `rebalancing_checklist.csv` - Action tracker
 7. `scenario_analysis_template.csv` - Stress test template
 8. `requirements.txt` - Python dependencies
-9. `README.md` - This file
+9. `config/` - Monitoring and observability configuration (Grafana Agent)
+10. `README.md` - This file
 
 ### Learning Resources
 - [CBOE Education Portal](https://www.cboe.com/education)
