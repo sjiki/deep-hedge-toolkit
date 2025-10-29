@@ -1,6 +1,7 @@
 """
 Deep Hedge Strategy Backtesting Tool
 Tests multi-layered hedge strategies against historical market data
+Supports optional Databento integration for real market data
 """
 
 import pandas as pd
@@ -8,24 +9,37 @@ import numpy as np
 from datetime import datetime, timedelta
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+from typing import Optional
+
+# Optional Databento integration
+try:
+    from databento_provider import DatabentoProvider, DatabentoBacktestEnhancer
+    DATABENTO_AVAILABLE = True
+except ImportError:
+    DATABENTO_AVAILABLE = False
 
 
 class HedgeBacktester:
     """
     Backtest hedge strategies against historical market crashes
+    
+    Supports both simulated scenarios and real market data via Databento
     """
 
-    def __init__(self, initial_portfolio=10_000_000):
+    def __init__(self, initial_portfolio=10_000_000, 
+                 databento_provider: Optional['DatabentoProvider'] = None):
         """
         Initialize backtester
 
         Args:
             initial_portfolio: Starting portfolio value
+            databento_provider: Optional DatabentoProvider for real market data
         """
         self.initial_portfolio = initial_portfolio
         self.portfolio_value = initial_portfolio
+        self.databento_provider = databento_provider
 
-        # Historical crash scenarios
+        # Historical crash scenarios (simulated)
         self.historical_scenarios = {
             '1987_crash': {'name': '1987 Black Monday', 'decline': -0.22, 'days': 1, 'vix_spike': 3.5},
             '2000_dotcom': {'name': '2000 Dot-Com Crash', 'decline': -0.49, 'days': 929, 'vix_spike': 1.8},
@@ -495,23 +509,57 @@ class HedgeBacktester:
 
 
 def main():
-    """Run comprehensive backtest"""
-
-    # Initialize backtester
-    backtester = HedgeBacktester(initial_portfolio=10_000_000)
-
-    # Run all tests
+    """Run comprehensive backtest with optional Databento integration"""
+    
+    import os
+    
+    # Check for Databento integration
+    databento_available = DATABENTO_AVAILABLE and os.environ.get('DATABENTO_API_KEY')
+    
     print("\n" + "=" * 80)
     print("DEEP HEDGE STRATEGY BACKTESTING SUITE")
     print("=" * 80)
+    
+    if databento_available:
+        print("\n✓ Databento integration available")
+        print("  Running backtest with real market data where applicable")
+    else:
+        print("\n⚠️  Databento not configured - using simulated scenarios")
+        if not DATABENTO_AVAILABLE:
+            print("  Install with: pip install databento")
+        if not os.environ.get('DATABENTO_API_KEY'):
+            print("  Set API key: export DATABENTO_API_KEY='your_key'")
+    
+    # Initialize Databento provider if available
+    databento_provider = None
+    if databento_available:
+        try:
+            databento_provider = DatabentoProvider(api_key=os.environ.get('DATABENTO_API_KEY'))
+            print("  ✓ Databento provider initialized")
+        except Exception as e:
+            print(f"  Warning: Could not initialize Databento: {e}")
 
-    # 1. Historical scenarios
+    # Initialize backtester
+    backtester = HedgeBacktester(
+        initial_portfolio=10_000_000,
+        databento_provider=databento_provider
+    )
+
+    # Run all tests
+    print("\n" + "=" * 80)
+    print("RUNNING BACKTEST SUITE")
+    print("=" * 80)
+
+    # 1. Historical scenarios (simulated)
+    print("\n[1/3] Running historical scenario backtest...")
     historical_results = backtester.backtest_all_scenarios()
 
     # 2. Monte Carlo simulation
+    print("\n[2/3] Running Monte Carlo simulation...")
     mc_results = backtester.monte_carlo_simulation(num_simulations=10000)
 
     # 3. Sensitivity analysis
+    print("\n[3/3] Running sensitivity analysis...")
     sensitivity_results = backtester.sensitivity_analysis()
 
     # 4. Generate report

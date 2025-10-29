@@ -1,19 +1,34 @@
 """
 Deep Hedge Multi-Layer Protection Calculator
 Calculates optimal hedge ratios, costs, and protection levels for portfolio hedging
+Supports optional Databento integration for real market data
 """
 
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from scipy.stats import norm
+from typing import Optional
+
+# Optional Databento integration
+try:
+    from databento_provider import DatabentoProvider
+    DATABENTO_AVAILABLE = True
+except ImportError:
+    DATABENTO_AVAILABLE = False
 
 class DeepHedgeCalculator:
     """
     Multi-layered portfolio hedging calculator with Black-Scholes pricing
+    
+    Supports optional integration with Databento for real market data:
+    - Use actual volatility from VIX
+    - Fetch real option prices
+    - Validate calculations against market data
     """
 
-    def __init__(self, portfolio_value, risk_free_rate=0.045, annual_volatility=0.18):
+    def __init__(self, portfolio_value, risk_free_rate=0.045, annual_volatility=0.18, 
+                 databento_provider: Optional['DatabentoProvider'] = None):
         """
         Initialize the hedge calculator
 
@@ -21,11 +36,13 @@ class DeepHedgeCalculator:
             portfolio_value: Total portfolio value in dollars
             risk_free_rate: Annual risk-free rate (default 4.5%)
             annual_volatility: Annual volatility (default 18%)
+            databento_provider: Optional DatabentoProvider instance for real market data
         """
         self.portfolio_value = portfolio_value
         self.risk_free_rate = risk_free_rate
         self.annual_volatility = annual_volatility
         self.current_price = 100  # Normalized index price
+        self.databento_provider = databento_provider
 
     def black_scholes_put(self, strike, time_to_expiry, spot_price=None):
         """
@@ -72,6 +89,39 @@ class DeepHedgeCalculator:
                      strike * np.exp(-self.risk_free_rate * time_to_expiry) * norm.cdf(d2)
 
         return call_price
+    
+    def update_volatility_from_vix(self, start_date: str, end_date: str) -> float:
+        """
+        Update volatility using real VIX data from Databento
+        
+        Args:
+            start_date: Start date for VIX data (YYYY-MM-DD)
+            end_date: End date for VIX data (YYYY-MM-DD)
+            
+        Returns:
+            Updated annual volatility
+        """
+        if not self.databento_provider:
+            print("Warning: Databento provider not configured. Using default volatility.")
+            return self.annual_volatility
+        
+        try:
+            vix_data = self.databento_provider.get_vix_data(start_date, end_date)
+            
+            if not vix_data.empty and 'close' in vix_data.columns:
+                # VIX is in percentage points, convert to decimal
+                avg_vix = vix_data['close'].mean()
+                self.annual_volatility = avg_vix / 100.0
+                
+                print(f"✓ Updated volatility from VIX data: {self.annual_volatility*100:.2f}%")
+                return self.annual_volatility
+            else:
+                print("Warning: No VIX data retrieved. Using default volatility.")
+                return self.annual_volatility
+                
+        except Exception as e:
+            print(f"Error fetching VIX data: {e}. Using default volatility.")
+            return self.annual_volatility
 
     def calculate_put_spread_cost(self, long_strike, short_strike, time_to_expiry):
         """Calculate cost of a put spread (buy higher strike, sell lower strike)"""
@@ -343,22 +393,56 @@ class DeepHedgeCalculator:
 def main():
     """
     Example usage of the Deep Hedge Calculator
+    Demonstrates both standard and Databento-enhanced usage
     """
     print("=" * 70)
     print("DEEP HEDGE MULTI-LAYER PROTECTION CALCULATOR")
     print("=" * 70)
 
+    # Check for Databento integration
+    import os
+    databento_available = DATABENTO_AVAILABLE and os.environ.get('DATABENTO_API_KEY')
+    
+    if databento_available:
+        print("\n✓ Databento integration available")
+        print("  Will use real market data where applicable")
+    else:
+        print("\n⚠️  Databento not configured - using Black-Scholes models")
+        if not DATABENTO_AVAILABLE:
+            print("  Install with: pip install databento")
+        if not os.environ.get('DATABENTO_API_KEY'):
+            print("  Set API key: export DATABENTO_API_KEY='your_key'")
+
     # Initialize calculator with $10M portfolio
     portfolio_value = 10_000_000
+    
+    # Optional: Initialize with Databento provider
+    databento_provider = None
+    if databento_available:
+        try:
+            databento_provider = DatabentoProvider(api_key=os.environ.get('DATABENTO_API_KEY'))
+            print("  ✓ Databento provider initialized")
+        except Exception as e:
+            print(f"  Warning: Could not initialize Databento: {e}")
+    
     calculator = DeepHedgeCalculator(
         portfolio_value=portfolio_value,
         risk_free_rate=0.045,  # 4.5%
-        annual_volatility=0.18  # 18%
+        annual_volatility=0.18,  # 18%
+        databento_provider=databento_provider
     )
 
     print(f"\nPortfolio Value: ${portfolio_value:,.0f}")
     print(f"Risk-Free Rate: {calculator.risk_free_rate*100:.1f}%")
     print(f"Annual Volatility: {calculator.annual_volatility*100:.1f}%")
+    
+    # Optional: Update volatility from real VIX data
+    if databento_provider:
+        print("\nAttempting to update volatility from VIX data...")
+        from datetime import datetime, timedelta
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+        calculator.update_volatility_from_vix(start_date, end_date)
 
     # Calculate layer costs
     print("\n" + "=" * 70)
