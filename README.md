@@ -44,7 +44,21 @@ Step-by-step guide with:
 - Crisis response protocols
 - Tax and regulatory considerations
 
-### 4. **Spreadsheet Templates** (CSV format)
+### 4. **Databento Market Data Integration** (`databento_provider.py`) 🆕
+Real market data integration for enhanced backtesting:
+- Fetch historical equity and index prices
+- Get actual option chain data and implied volatility
+- Access VIX data for real volatility calculations
+- Backtest strategies with actual market crash data
+
+**Features:**
+- ✓ Direct integration with Databento API
+- ✓ Support for multiple datasets (OPRA, NASDAQ, etc.)
+- ✓ Historical market crash data retrieval
+- ✓ Option Greeks extraction
+- ✓ Real-world backtesting capabilities
+
+### 5. **Spreadsheet Templates** (CSV format)
 Ready-to-use tracking templates:
 - `hedge_tracking_template.csv` - Position tracking with Greeks
 - `monthly_performance_template.csv` - Monthly P&L analysis
@@ -60,6 +74,7 @@ Ready-to-use tracking templates:
 - Python 3.8 or higher
 - pip package manager
 - Microsoft Excel or LibreOffice (for viewing generated reports)
+- (Optional) Databento API key for real market data integration
 
 ### Installation
 
@@ -70,6 +85,9 @@ cd deep-hedge-toolkit
 
 # Install required packages
 pip install -r requirements.txt
+
+# Optional: Set up Databento API key for real market data
+export DATABENTO_API_KEY='your_api_key_here'
 ```
 
 ### Verify Installation
@@ -116,6 +134,47 @@ python backtest_hedge_strategy.py
 ```
 This will run the full backtesting suite and generate a comprehensive Excel report.
 
+**Option 3: Databento Real Market Data Integration** 🆕
+```python
+import os
+from databento_provider import DatabentoProvider
+
+# Initialize with API key
+provider = DatabentoProvider(api_key=os.environ.get('DATABENTO_API_KEY'))
+
+# Fetch historical prices
+spy_data = provider.get_historical_prices(
+    symbol='SPY',
+    start_date='2020-01-01',
+    end_date='2020-12-31',
+    dataset='XNAS.ITCH'
+)
+
+# Get VIX data for real volatility
+vix_data = provider.get_vix_data(
+    start_date='2020-01-01',
+    end_date='2020-12-31'
+)
+
+# Backtest with real crash data
+from databento_provider import DatabentoBacktestEnhancer
+from hedge_calculator import DeepHedgeCalculator
+
+calculator = DeepHedgeCalculator(portfolio_value=10_000_000)
+enhancer = DatabentoBacktestEnhancer(provider)
+
+crash_periods = [
+    {'name': '2020 COVID', 'start': '2020-02-19', 'end': '2020-03-23'}
+]
+
+results = enhancer.backtest_with_real_data(
+    symbol='SPY',
+    crash_periods=crash_periods,
+    hedge_calculator=calculator
+)
+print(results)
+```
+
 ---
 
 ## 📊 Example Output
@@ -143,6 +202,20 @@ This will run the full backtesting suite and generate a comprehensive Excel repo
 ---
 
 ## 🛠️ Advanced Features
+
+### Databento Market Data Integration 🆕
+Real-world data for enhanced accuracy:
+- **Historical Price Data**: Fetch actual market data instead of simulated scenarios
+- **Option Chain Data**: Get real option prices and implied volatility
+- **VIX Integration**: Use actual volatility data for calculations
+- **Real Crash Analysis**: Backtest with actual market crash events
+- **Live Market Data**: Access near real-time data for current positions
+
+**Benefits:**
+- More accurate backtesting with real market conditions
+- Better option pricing using actual market data
+- Realistic volatility estimates from VIX
+- Validation of Black-Scholes assumptions
 
 ### Optimal Hedge Ratio Finder
 Automatically determines the optimal coverage percentage to meet your:
@@ -270,17 +343,19 @@ Hedged portfolios typically show improved Sharpe ratios due to reduced downside 
 ### Files in This Package
 1. `hedge_calculator.py` - Core calculation engine
 2. `backtest_hedge_strategy.py` - Historical analysis
-3. `deep_hedge_workflow.md` - Implementation guide
-4. `hedge_tracking_template.csv` - Position tracker
-5. `monthly_performance_template.csv` - Performance tracker
-6. `rebalancing_checklist.csv` - Action tracker
-7. `scenario_analysis_template.csv` - Stress test template
-8. `requirements.txt` - Python dependencies
-9. `README.md` - This file
+3. `databento_provider.py` - Real market data integration 🆕
+4. `deep_hedge_workflow.md` - Implementation guide
+5. `hedge_tracking_template.csv` - Position tracker
+6. `monthly_performance_template.csv` - Performance tracker
+7. `rebalancing_checklist.csv` - Action tracker
+8. `scenario_analysis_template.csv` - Stress test template
+9. `requirements.txt` - Python dependencies
+10. `README.md` - This file
 
 ### Learning Resources
 - [CBOE Education Portal](https://www.cboe.com/education)
 - [Options Industry Council](https://www.optionseducation.org)
+- [Databento Documentation](https://databento.com/docs) 🆕
 - CFA Institute hedging frameworks
 
 ---
