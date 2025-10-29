@@ -2,6 +2,37 @@
 
 A comprehensive, step-by-step guide for implementing multi-layered portfolio hedging strategies.
 
+**NEW:** Now includes Databento market data integration for enhanced backtesting and real-time data analysis.
+
+---
+
+## Phase 0: Data Setup (Optional but Recommended) 🆕
+
+### Step 0.1: Databento Integration Setup
+**Timeline: Before Phase 1**
+
+- [ ] Sign up for Databento account at https://databento.com
+- [ ] Choose appropriate data subscription plan:
+  - [ ] Historical data for backtesting
+  - [ ] Real-time/delayed feeds for monitoring
+  - [ ] Options data (OPRA) for pricing validation
+- [ ] Set up API credentials:
+  ```bash
+  export DATABENTO_API_KEY='your_api_key_here'
+  ```
+- [ ] Test connection with example script:
+  ```bash
+  python example_databento_usage.py
+  ```
+
+**Benefits:**
+- Use actual market data instead of Black-Scholes approximations
+- Validate hedge prices against real option quotes
+- Access real VIX data for volatility calculations
+- Backtest with historical market crash data
+
+**Deliverable:** Working Databento connection with API key configured
+
 ---
 
 ## Phase 1: Portfolio Assessment & Setup
@@ -14,6 +45,7 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - [ ] Analyze sector concentrations
 - [ ] Determine liquidity needs (when might you need to exit hedges?)
 - [ ] Review correlation with major indices (S&P 500, Russell 2000, etc.)
+- [ ] **NEW:** Fetch historical portfolio index data via Databento (if available)
 
 **Deliverable:** Portfolio analysis spreadsheet
 
@@ -21,6 +53,7 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - Portfolio management software
 - Correlation calculator
 - Beta calculation: `β = Covariance(Portfolio, Market) / Variance(Market)`
+- **NEW:** `databento_provider.py` for historical data
 
 ---
 
@@ -67,6 +100,30 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - Risk-free rate: ___________%
 - VIX level: ___________
 
+**NEW: Use Real Market Data (with Databento):**
+```python
+from databento_provider import DatabentoProvider
+from hedge_calculator import DeepHedgeCalculator
+import os
+
+# Initialize with real data
+provider = DatabentoProvider(api_key=os.environ.get('DATABENTO_API_KEY'))
+
+# Fetch current VIX for volatility
+vix_data = provider.get_vix_data(
+    start_date='2024-01-01',
+    end_date='2024-12-31'
+)
+current_volatility = vix_data['close'].iloc[-1] / 100.0
+
+# Initialize calculator with real volatility
+calculator = DeepHedgeCalculator(
+    portfolio_value=10_000_000,
+    annual_volatility=current_volatility,
+    databento_provider=provider
+)
+```
+
 **Calculations:**
 
 ```
@@ -89,12 +146,25 @@ Hedge Ratio = ($10M × 1.1) / (4500 × 100) = 24.4 contracts
 ### Step 2.2: Select Specific Instruments
 **Timeline: Week 2, Day 3**
 
+**NEW: Validate Prices with Market Data**
+Before finalizing strikes, check real market prices:
+```python
+# Get current option chain
+option_chain = provider.get_option_chain(
+    symbol='SPY',
+    date='2024-12-31'
+)
+
+# Compare Black-Scholes vs. actual market prices
+```
+
 #### Layer 1: Near-Term Protection (1-3 months)
 
 **Option A: Collar Strategy**
 - [ ] Buy puts: Strike _____ (98% of current), Expiry: _____
 - [ ] Sell calls: Strike _____ (102% of current), Expiry: _____
 - [ ] Net cost per contract: $_____
+- [ ] **NEW:** Market price validation: $_____
 - [ ] Number of contracts: _____
 - [ ] Total cost: $_____
 
