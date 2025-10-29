@@ -11,15 +11,38 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 ### Step 0.1: Databento Integration Setup
 **Timeline: Before Phase 1**
 
-- [ ] Sign up for Databento account at https://databento.com
+**⚠️ IMPORTANT CONSIDERATIONS:**
+- **Cost:** Databento is a paid service. Review pricing at https://databento.com/pricing before subscribing.
+- **Data Privacy:** When using Databento, market data queries are logged. Review their privacy policy.
+- **Security:** API keys provide access to your account. Treat them like passwords.
+- **Requirements:** This is completely optional. The toolkit works without Databento using Black-Scholes models.
+
+**Setup Steps:**
+- [ ] Review Databento pricing and data policies at https://databento.com
+- [ ] Sign up for Databento account at https://databento.com (if cost-effective for your use case)
 - [ ] Choose appropriate data subscription plan:
-  - [ ] Historical data for backtesting
+  - [ ] Historical data for backtesting (most common)
   - [ ] Real-time/delayed feeds for monitoring
   - [ ] Options data (OPRA) for pricing validation
-- [ ] Set up API credentials:
+- [ ] Set up API credentials securely:
   ```bash
+  # Option 1: Environment variable (for development/testing only)
   export DATABENTO_API_KEY='your_api_key_here'
+  
+  # Option 2: Store in .env file (DO NOT commit to git)
+  echo "DATABENTO_API_KEY=your_api_key_here" >> .env
+  
+  # Add .env to .gitignore
+  echo ".env" >> .gitignore
   ```
+  
+  **🔒 API Key Security:**
+  - Never commit API keys to version control
+  - Never share API keys in public forums
+  - Rotate keys regularly
+  - Consider using a secrets manager for production use
+  - Review .gitignore to ensure .env is excluded
+
 - [ ] Test connection with example script:
   ```bash
   python example_databento_usage.py
@@ -30,8 +53,22 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - Validate hedge prices against real option quotes
 - Access real VIX data for volatility calculations
 - Backtest with historical market crash data
+- More accurate implied volatility estimates
 
-**Deliverable:** Working Databento connection with API key configured
+**Costs vs. Benefits Analysis:**
+Consider Databento if:
+- ✅ Managing portfolio > $1M where accuracy matters
+- ✅ Need to validate complex option strategies
+- ✅ Running frequent backtests with real data
+- ✅ Institutional/professional use case
+
+Skip Databento if:
+- ❌ Learning/educational purposes only
+- ❌ Small portfolio where costs > benefits
+- ❌ Black-Scholes models sufficient for your needs
+- ❌ Budget constraints
+
+**Deliverable:** Working Databento connection with API key configured (if opted in)
 
 ---
 
@@ -45,7 +82,30 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - [ ] Analyze sector concentrations
 - [ ] Determine liquidity needs (when might you need to exit hedges?)
 - [ ] Review correlation with major indices (S&P 500, Russell 2000, etc.)
-- [ ] **NEW:** Fetch historical portfolio index data via Databento (if available)
+- [ ] **NEW (with Databento):** Fetch historical benchmark index data for correlation analysis:
+  ```python
+  # Example: Fetch SPY (S&P 500) data for beta calculation
+  spy_data = provider.get_historical_prices(
+      symbol='SPY',
+      start_date='2023-01-01',
+      end_date='2024-12-31',
+      dataset='XNAS.ITCH'  # NASDAQ dataset
+  )
+  
+  # Or QQQ for tech-heavy portfolios
+  qqq_data = provider.get_historical_prices(
+      symbol='QQQ',
+      start_date='2023-01-01',
+      end_date='2024-12-31',
+      dataset='XNAS.ITCH'
+  )
+  ```
+  
+  **Recommended Benchmarks:**
+  - SPY: For broad market exposure (S&P 500)
+  - QQQ: For tech-heavy portfolios (NASDAQ-100)
+  - IWM: For small-cap exposure (Russell 2000)
+  - DIA: For blue-chip exposure (Dow Jones)
 
 **Deliverable:** Portfolio analysis spreadsheet
 
@@ -53,7 +113,7 @@ A comprehensive, step-by-step guide for implementing multi-layered portfolio hed
 - Portfolio management software
 - Correlation calculator
 - Beta calculation: `β = Covariance(Portfolio, Market) / Variance(Market)`
-- **NEW:** `databento_provider.py` for historical data
+- **NEW:** `databento_provider.py` for historical benchmark data
 
 ---
 
@@ -146,8 +206,10 @@ Hedge Ratio = ($10M × 1.1) / (4500 × 100) = 24.4 contracts
 ### Step 2.2: Select Specific Instruments
 **Timeline: Week 2, Day 3**
 
-**NEW: Validate Prices with Market Data**
-Before finalizing strikes, check real market prices:
+**NEW: Validate Prices with Market Data (Databento)**
+
+Before finalizing strikes, compare theoretical Black-Scholes prices with actual market prices:
+
 ```python
 # Get current option chain
 option_chain = provider.get_option_chain(
@@ -155,8 +217,35 @@ option_chain = provider.get_option_chain(
     date='2024-12-31'
 )
 
-# Compare Black-Scholes vs. actual market prices
+# Example validation process:
+# 1. Calculate Black-Scholes price
+bs_put_price = calculator.black_scholes_put(strike=98, time_to_expiry=90/365)
+
+# 2. Find corresponding market price from option chain
+# (Look for 98 strike, 90 days to expiry)
+
+# 3. Compare prices
+# Acceptable deviation: ±10-15% for liquid options
+# If market_price = $2.00 and bs_price = $2.20:
+#   deviation = |2.00 - 2.20| / 2.00 = 10% ✓ Acceptable
+#   deviation = |2.00 - 2.60| / 2.00 = 30% ✗ Too high, adjust volatility
+
+# 4. Adjust volatility if needed
+if abs(market_price - bs_price) / market_price > 0.15:
+    # Use implied volatility from market or adjust parameters
+    calculator.annual_volatility = implied_vol_from_market
 ```
+
+**Price Validation Criteria:**
+- ✅ Deviation < 10%: Excellent, prices align well
+- ⚠️ Deviation 10-15%: Acceptable for planning
+- ❌ Deviation > 15%: Adjust volatility or use market prices directly
+
+**Common Causes of Large Deviations:**
+- Stale volatility estimate (use VIX data)
+- Earnings announcements pending
+- Options illiquid (wide bid-ask spread)
+- Black swan events (VIX spike)
 
 #### Layer 1: Near-Term Protection (1-3 months)
 
