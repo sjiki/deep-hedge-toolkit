@@ -1,15 +1,58 @@
 # Deep Hedge Strategy Toolkit
 
-A comprehensive suite of tools for implementing and managing multi-layered portfolio hedging strategies.
+A comprehensive suite of tools for implementing and managing multi-layered portfolio hedging strategies, including advanced VIX ETP trading using Reinforcement Learning.
 
-![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
 ---
 
 ## 📦 What's Included
 
-### 1. **Hedge Calculator** (`hedge_calculator.py`)
+### 1. **VIX ETP Reinforcement Learning Module** (NEW!)
+Advanced machine learning system for VIX ETP portfolio optimization:
+- PPO and SAC reinforcement learning agents
+- Regime-aware trading with VIX spike detection
+- Dynamic execution cost modeling
+- Risk budgeting and portfolio constraints
+- Hyperparameter tuning with Optuna
+- Rolling walk-forward validation
+- Comprehensive performance reporting
+
+**Key Features:**
+- ✓ Multi-asset VIX ETP trading (UVXY, SVXY, VXX, VIXY)
+- ✓ Regime classification (Calm, BuildUp, Spike, MeanRevert)
+- ✓ Transaction cost modeling (spread + market impact)
+- ✓ Portfolio constraints (leverage, turnover, position limits)
+- ✓ CSV data support with flexible column mapping
+- ✓ Automated testing (43+ unit tests)
+- ✓ CLI interface for all operations
+
+**Quick Start:**
+```bash
+# Train a PPO agent
+python -m scripts.cli train --agent ppo --timesteps 100000
+
+# Run hyperparameter tuning
+python -m scripts.cli tune --trials 50
+
+# Perform walk-forward validation
+python -m scripts.cli walkforward --agent ppo
+
+# Generate performance report
+python -m scripts.cli report
+
+# Or use Makefile
+make train
+make tune
+make walkforward
+make report
+```
+
+See [docs/STEP_BY_STEP.md](docs/STEP_BY_STEP.md) for detailed guide.
+
+### 2. **Hedge Calculator** (`hedge_calculator.py`)
 Python-based calculator for designing optimal hedge strategies:
 - Black-Scholes pricing for puts and calls
 - Multi-layer cost calculations
@@ -267,16 +310,31 @@ Hedged portfolios typically show improved Sharpe ratios due to reduced downside 
 
 ## 📚 Additional Resources
 
-### Files in This Package
-1. `hedge_calculator.py` - Core calculation engine
-2. `backtest_hedge_strategy.py` - Historical analysis
-3. `deep_hedge_workflow.md` - Implementation guide
-4. `hedge_tracking_template.csv` - Position tracker
-5. `monthly_performance_template.csv` - Performance tracker
-6. `rebalancing_checklist.csv` - Action tracker
-7. `scenario_analysis_template.csv` - Stress test template
-8. `requirements.txt` - Python dependencies
-9. `README.md` - This file
+### Package Structure
+
+**Core Hedging Tools:**
+1. `hedge_calculator.py` - Hedge strategy calculator
+2. `backtest_hedge_strategy.py` - Historical backtesting
+3. `deep_hedge_workflow.md` - Implementation workflow
+4. CSV templates for tracking and analysis
+
+**VIX ETP RL Module:**
+- `data/` - Data loading (CSV, Polygon, yfinance)
+- `models/` - Regime classification
+- `env/` - Trading environment & constraints
+- `agents/` - PPO and SAC agent wrappers
+- `scripts/` - Training pipelines and CLI
+- `tests/` - Comprehensive test suite (43+ tests)
+- `config/` - Configuration files
+- `docs/` - Step-by-step guides
+- `examples/` - Usage examples
+
+**Key Files:**
+- `scripts/cli.py` - Unified command-line interface
+- `config/vix_etp_config.yaml` - Configuration
+- `docs/STEP_BY_STEP.md` - Detailed guide
+- `Makefile` - Convenience commands
+- `.github/workflows/tests.yml` - CI/CD pipeline
 
 ### Learning Resources
 - [CBOE Education Portal](https://www.cboe.com/education)
