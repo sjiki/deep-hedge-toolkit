@@ -1,0 +1,174 @@
+# VIX ETP Reinforcement Learning Configuration
+
+# Data Sources
+data:
+  # CSV sources (optional, will be used if provided)
+  csv_sources:
+    vix: null  # Path to VIX CSV file (columns: date, close, volume)
+    spy: null  # Path to SPY CSV file (columns: date, close, volume)
+  
+  # Polygon.io API configuration
+  polygon:
+    api_key: ${POLYGON_API_KEY}  # Set via environment variable
+    tickers:
+      - UVXY
+      - SVXY
+      - VXX
+      - VIXY
+    date_from: "2020-01-01"
+    date_to: null  # null means today
+  
+  # Feature engineering
+  features:
+    lookback_days: 60
+    vol_window: 20
+    trend_window: 10
+    regime_window: 30
+
+# Regime Classification
+regime:
+  model_type: lightgbm  # Options: lightgbm, logistic
+  regimes:
+    - Calm
+    - BuildUp
+    - Spike
+    - MeanRevert
+  
+  # Heuristic labeling thresholds
+  labeling:
+    calm_vix_threshold: 20
+    buildup_vix_change: 2.0
+    spike_vix_level: 30
+    spike_vix_change: 5.0
+    meanrevert_from_spike: 25
+  
+  # Model hyperparameters
+  lightgbm:
+    n_estimators: 100
+    max_depth: 5
+    learning_rate: 0.05
+    num_leaves: 31
+  
+  logistic:
+    max_iter: 1000
+    C: 1.0
+
+# Environment Configuration
+environment:
+  # Execution costs
+  execution:
+    base_spread_bps: 10  # Base spread in basis points
+    participation_impact: 0.001  # Market impact coefficient
+    borrow_cost_annual:
+      UVXY: 0.05  # 5% annual borrow cost
+      SVXY: 0.03
+      VXX: 0.04
+      VIXY: 0.04
+  
+  # Portfolio constraints
+  constraints:
+    max_leverage: 1.0  # Long-only (no leverage)
+    max_position: 0.4  # Max 40% in single asset
+    min_position: 0.0  # Long-only
+    max_turnover_daily: 0.2  # Max 20% turnover per day
+    position_bands:
+      min: 0.05  # Min 5% per position if held
+      max: 0.35  # Max 35% per position
+  
+  # Risk management
+  risk:
+    use_risk_budgeting: true
+    covariance_window: 60
+    risk_budget_equal_weight: true
+    spike_cooldown_days: 5
+    cooldown_turnover_scale: 0.5  # Reduce turnover by 50% during cooldown
+  
+  # Rebalancing
+  rebalancing:
+    frequency_days: 1  # Daily rebalancing
+    min_history_days: 60  # Min data for asset availability
+  
+  # Initial state
+  initial_cash: 100000.0
+
+# Agent Configuration
+agents:
+  # PPO agent
+  ppo:
+    policy: MlpPolicy
+    learning_rate: 0.0003
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99
+    gae_lambda: 0.95
+    clip_range: 0.2
+    ent_coef: 0.01
+    vf_coef: 0.5
+    max_grad_norm: 0.5
+    total_timesteps: 100000
+  
+  # SAC agent
+  sac:
+    policy: MlpPolicy
+    learning_rate: 0.0003
+    buffer_size: 100000
+    learning_starts: 1000
+    batch_size: 256
+    tau: 0.005
+    gamma: 0.99
+    train_freq: 1
+    gradient_steps: 1
+    ent_coef: auto
+    total_timesteps: 100000
+
+# Training Pipeline
+training:
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  reward_type: sharpe  # Options: sharpe, sortino, returns
+  observation_window: 30
+  seed: 42
+
+# Optuna Hyperparameter Tuning
+optuna:
+  n_trials: 50
+  timeout_seconds: 3600
+  n_jobs: 1
+  
+  # Parameters to tune
+  tune_params:
+    learning_rate: [0.0001, 0.001]
+    clip_range: [0.1, 0.3]
+    ent_coef: [0.0, 0.1]
+    gamma: [0.95, 0.99]
+    max_turnover_daily: [0.1, 0.3]
+    spike_cooldown_days: [3, 10]
+
+# Rolling Walk-forward
+walkforward:
+  train_window_days: 365
+  test_window_days: 90
+  step_days: 30
+  min_train_samples: 200
+
+# Reporting
+reporting:
+  output_dir: outputs
+  metrics:
+    - sharpe_ratio
+    - sortino_ratio
+    - calmar_ratio
+    - max_drawdown
+    - expected_shortfall_95
+    - hit_ratio
+    - total_return
+    - volatility
+  
+  plots:
+    - equity_curve
+    - drawdown
+    - positions
+    - regime_distribution
+    - returns_histogram
