@@ -124,7 +124,7 @@ class RegimeClassifier:
         df['recent_spike'] = (vix.rolling(5).max() > self.labeling_params['spike_vix_level']).astype(int)
         df['days_since_spike'] = self._days_since_condition(vix > self.labeling_params['spike_vix_level'])
         
-        return df.fillna(method='bfill').fillna(0)
+        return df.bfill().fillna(0)
     
     def _compute_rsi(self, prices: pd.Series, window: int = 14) -> pd.Series:
         """Compute RSI indicator."""

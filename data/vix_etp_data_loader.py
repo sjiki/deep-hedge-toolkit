@@ -71,7 +71,7 @@ class VIXETPDataLoader:
             volume_df = volume_df.sort_index()
             
             # Forward fill then backward fill for prices
-            price_df = price_df.fillna(method='ffill').fillna(method='bfill')
+            price_df = price_df.ffill().bfill()
             
             # Fill volumes with 0
             volume_df = volume_df.fillna(0)

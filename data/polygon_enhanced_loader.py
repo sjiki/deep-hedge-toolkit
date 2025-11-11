@@ -167,7 +167,7 @@ class PolygonEnhancedLoader:
         volume_df = pd.DataFrame(volumes)
         
         # Fill forward then backward for missing values
-        price_df = price_df.fillna(method='ffill').fillna(method='bfill')
+        price_df = price_df.ffill().bfill()
         volume_df = volume_df.fillna(0)
         
         return price_df, volume_df
