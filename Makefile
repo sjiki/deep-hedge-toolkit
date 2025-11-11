@@ -19,22 +19,22 @@ test:
 	pytest tests/ -v
 
 train:
-	python scripts/cli.py train --agent ppo --timesteps 100000
+	python -m scripts.cli train --agent ppo --timesteps 100000
 
 train-sac:
-	python scripts/cli.py train --agent sac --timesteps 100000
+	python -m scripts.cli train --agent sac --timesteps 100000
 
 tune:
-	python scripts/cli.py tune --trials 50 --timesteps 50000
+	python -m scripts.cli tune --trials 50 --timesteps 50000
 
 walkforward:
-	python scripts/cli.py walkforward --agent ppo --timesteps 50000
+	python -m scripts.cli walkforward --agent ppo --timesteps 50000
 
 report:
-	python scripts/cli.py report
+	python -m scripts.cli report
 
 eval:
-	python scripts/cli.py eval --model outputs/vix_etp_ppo_model.zip --agent ppo
+	python -m scripts.cli eval --model outputs/vix_etp_ppo_model.zip --agent ppo
 
 clean:
 	rm -rf outputs/*

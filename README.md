@@ -32,16 +32,22 @@ Advanced machine learning system for VIX ETP portfolio optimization:
 **Quick Start:**
 ```bash
 # Train a PPO agent
-python scripts/cli.py train --agent ppo --timesteps 100000
+python -m scripts.cli train --agent ppo --timesteps 100000
 
 # Run hyperparameter tuning
-python scripts/cli.py tune --trials 50
+python -m scripts.cli tune --trials 50
 
 # Perform walk-forward validation
-python scripts/cli.py walkforward --agent ppo
+python -m scripts.cli walkforward --agent ppo
 
 # Generate performance report
-python scripts/cli.py report
+python -m scripts.cli report
+
+# Or use Makefile
+make train
+make tune
+make walkforward
+make report
 ```
 
 See [docs/STEP_BY_STEP.md](docs/STEP_BY_STEP.md) for detailed guide.
